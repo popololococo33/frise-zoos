@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Histoire des parcs zoologiques</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout : une colonne de lecture, une ligne verticale (la frise) avec des cartes datées, regroupées par périodes. */
+:root {
+  --bg: #f3f5f1;
+  --surface: #ffffff;
+  --ink: #1d2a24;
+  --muted: #5b6b63;
+  --line: #c9d3cc;
+  --accent: #2f6b4f;      /* vert feuillage */
+  --accent-soft: #e2ede6;
+  --ochre: #a86a12;       /* dates clés */
+  --ochre-soft: #f6ead6;
+  --warn: #9a3b2b;
+  --warn-soft: #f7e4df;
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141a17; --surface: #1c2420; --ink: #e6ece8; --muted: #9fb0a7; --line: #34433b;
+    --accent: #7cc39f; --accent-soft: #22352b; --ochre: #e0a54a; --ochre-soft: #3a2e1a;
+    --warn: #ec8f7d; --warn-soft: #3b231e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141a17; --surface: #1c2420; --ink: #e6ece8; --muted: #9fb0a7; --line: #34433b;
+  --accent: #7cc39f; --accent-soft: #22352b; --ochre: #e0a54a; --ochre-soft: #3a2e1a;
+  --warn: #ec8f7d; --warn-soft: #3b231e; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 6vw, 2.8rem); line-height: 1.1; }
+h2 { font-size: 1.55rem; line-height: 1.2; }
+h3 { font-size: 1.15rem; line-height: 1.3; }
+p { margin: 0; }
+.eyebrow { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+header { display: flex; flex-direction: column; gap: 14px; }
+.lead { color: var(--muted); max-width: 62ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .9rem; color: var(--muted); }
+.legend b { color: var(--ink); font-weight: 600; }
+.howto { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; font-size: .95rem; }
+.howto ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px; }
+.btn { font: 600 .95rem var(--font-body); color: var(--surface); background: var(--accent); border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; align-self: flex-start; }
+.btn:focus-visible { outline: 3px solid var(--ochre); outline-offset: 2px; }
+.btn-status { font-size: .9rem; color: var(--accent); min-height: 1.3em; }
+
+/* Frise */
+.period { display: flex; flex-direction: column; gap: 18px; }
+.period-head { display: flex; flex-direction: column; gap: 4px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
+.period-head p { color: var(--muted); font-size: .95rem; }
+.track { position: relative; display: flex; flex-direction: column; gap: 16px; padding-left: 26px; }
+.track::before { content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+.ev { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ev::before { content: ""; position: absolute; left: -25px; top: 18px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+.ev.key::before { background: var(--ochre); border-color: var(--ochre); }
+.ev .date { font-family: var(--font-mono); font-weight: 500; font-size: .95rem; color: var(--accent); font-variant-numeric: tabular-nums; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ev.key .date { color: var(--ochre); }
+.tag { font-family: var(--font-body); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: var(--ochre-soft); color: var(--ochre); }
+.ev .txt { color: var(--ink); }
+.ev ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 3px; }
+.meta { display: flex; flex-direction: column; gap: 4px; font-size: .86rem; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+.meta span b { color: var(--ink); font-weight: 600; }
+.check { font-size: .86rem; color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 6px 10px; }
+
+/* Définitions */
+.defs { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.def { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.def dt { font-weight: 700; }
+.def dd { margin: 0; }
+.def .src { font-size: .82rem; color: var(--muted); }
+.acro { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+th, td { text-align: left; padding: 8px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-mono); font-weight: 500; color: var(--accent); white-space: nowrap; }
+tr:last-child th, tr:last-child td { border-bottom: 0; }
+
+/* 4 missions */
+.missions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 560px) { .missions { grid-template-columns: 1fr; } }
+.mission { background: var(--accent-soft); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+.mission .n { font-family: var(--font-display); font-size: 1.9rem; color: var(--accent); line-height: 1; }
+.cond { background: var(--surface); border: 2px solid var(--accent); border-radius: 12px; padding: 14px 16px; }
+
+.notes { display: flex; flex-direction: column; gap: 10px; }
+.notes li { margin-bottom: 6px; }
+footer { font-size: .85rem; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Frise chronologique · Soigneur animalier</span>
+    <h1>Histoire des parcs zoologiques et de leurs évolutions</h1>
+    <p class="lead">De la ménagerie des rois au zoo de conservation. Chaque case donne la date, ce qu'il s'est passé et une courte explication. Toutes les informations viennent uniquement des documents fournis.</p>
+    <div class="howto">
+      <strong>Comment lire cette frise</strong>
+      <ul>
+        <li><b style="color:var(--ochre)">● Date clé</b> : à garder absolument si la frise doit être courte.</li>
+        <li>● Les autres cases complètent l'histoire ; elles peuvent être retirées ou fusionnées.</li>
+        <li><b>Image</b> : une idée d'illustration à chercher.</li>
+        <li><b>Source</b> : le document d'où vient l'information.</li>
+      </ul>
+      <div class="legend">
+        <span><b>Notes</b> = notes manuscrites</span>
+        <span><b>Mémoire</b> = mémoire HAL 2016 (pages)</span>
+        <span><b>MNHN</b> = Genially « Le zoo au 21e siècle » et « Des zoos pour quoi faire ? »</span>
+        <span><b>Vidéo Ménagerie</b> = « Histoire de la ménagerie » (Muséum)</span>
+        <span><b>Vidéo Toopet</b> = « La folle histoire des zoos »</span>
+        <span><b>Vidéo Brut</b> = « Les zoos humains »</span>
+      </div>
+      <button class="btn" id="copy-all" type="button">Copier toute la frise en texte</button>
+      <span class="btn-status" id="copy-status" aria-live="polite"></span>
+    </div>
+  </header>
+
+  <main id="frise" class="wrap" style="gap:40px"></main>
+
+  <section class="period" id="definitions">
+    <div class="period-head">
+      <span class="eyebrow">À placer sous la frise</span>
+      <h2>Définitions importantes</h2>
+    </div>
+    <dl class="defs" id="defs"></dl>
+    <h3>Les sigles</h3>
+    <div class="acro">
+      <table>
+        <tbody id="acro"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="period" id="missions">
+    <div class="period-head">
+      <span class="eyebrow">À la toute fin de la frise</span>
+      <h2>Les 4 missions d'un zoo en 2026</h2>
+      <p>Elles apparaissent dans les notes (schéma autour du mot « zoo »), dans le Genially du MNHN et dans le mémoire.</p>
+    </div>
+    <div class="missions" id="mission-list"></div>
+    <p class="cond"><b>Condition indispensable :</b> selon le MNHN, ces quatre missions ne sont légitimes qu'à condition de garantir le bien-être des animaux (enrichissement, protocoles d'évaluation de la bientraitance, entraînement médical).</p>
+  </section>
+
+  <section class="period" id="verif">
+    <div class="period-head">
+      <span class="eyebrow">À savoir</span>
+      <h2>Points de vigilance</h2>
+      <p>Les endroits où les documents ne disent pas la même chose. Rien n'a été ajouté depuis d'autres sources.</p>
+    </div>
+    <ul class="notes" id="vigilance"></ul>
+  </section>
+
+  <footer>Sources : notes manuscrites, mémoire HAL 2016 (pages 25 à 29, 39-40, 55, 79, 86 à 89), Genially MNHN / MFR Carquefou, vidéos « Histoire de la ménagerie » (Muséum Formation), « La folle histoire des zoos » (Toopet), « Les zoos humains » (Brut).</footer>
+</div>
+
+<script>
+const PERIODES = [
+  {
+    titre: "Avant les zoos : les animaux des puissants",
+    sous: "De l'Antiquité au XVIIe siècle",
+    ev: [
+      { d: "Antiquité", t: "Égyptiens, Grecs et Romains gardent des animaux sauvages",
+        x: "Des animaux exotiques sont capturés dans la nature. Les Romains s'en servent pour les jeux du cirque (combats contre des fauves), les Grecs les vénèrent pour des raisons religieuses, les Égyptiens en font des animaux de compagnie ou de jeu.",
+        img: "Mosaïque romaine ou arène avec des fauves", s: "Vidéo Toopet" },
+      { d: "Années 1200", key: true, t: "Les premières ménageries privées",
+        x: "Des rois et des aristocrates très riches font capturer et importer des animaux sauvages pour montrer leur richesse et leur puissance. Le transport est difficile et beaucoup d'animaux meurent. Exemple déjà au XIIe siècle en Angleterre : Henri Ier fait venir des lions et des fauves dans son château de Woodstock.",
+        img: "Lion en cage dans un château médiéval", s: "Vidéo Toopet ; Notes p.4" },
+      { d: "1254 – 1264", t: "Un ours polaire, puis la « Tour des Lions » à Londres",
+        x: "En 1254, sous Henri III, arrive le premier ours polaire en cage. En 1264, les animaux sont déplacés dans une tour du château, rebaptisée « Tour des Lions ». Seuls le roi et ses invités en profitent.",
+        img: "Tour de Londres / ours polaire", s: "Vidéo Toopet ; Notes p.4" },
+      { d: "Fin du XVIe siècle", t: "Le public peut venir voir les animaux",
+        x: "À la Tour des Lions, le peuple a enfin le droit de venir voir les animaux achetés et exposés par les riches : ce sont les tout débuts de l'idée de parc zoologique. Plus tard, le premier éléphant présenté au public en Europe est exposé au pied de la Tour de Londres.",
+        img: "Gravure de la Tour de Londres, éléphant", s: "Vidéo Toopet ; Notes p.4" },
+      { d: "XVIe – début XVIIe siècle", key: true, t: "Ménageries réservées à l'aristocratie",
+        x: "Les animaux rares et exotiques sont collectionnés, classés et exposés comme des objets de cabinets de curiosités, pour montrer la richesse. Seuls les invités de marque peuvent les voir : c'est le signe du pouvoir du roi et de la domination de l'homme sur la nature. La mortalité est forte (besoins des animaux mal connus, mauvaises conditions de capture et de transport).",
+        img: "Cabinet de curiosités", s: "Mémoire p.25-26 ; Notes p.5" },
+    ]
+  },
+  {
+    titre: "Les ménageries royales et le Jardin du Roi",
+    sous: "XVIIe – XVIIIe siècle",
+    ev: [
+      { d: "1635 → 1750", t: "Du jardin des plantes médicinales au Jardin du Roi (Paris)",
+        x: "Le Jardin royal des plantes médicinales est créé en 1635 (ouvert au public en 1640). Il devient le Jardin du Roi en 1718. Vers 1750, Buffon, intendant du jardin, ajoute aux plantes des collections de zoologie et de minéralogie, mais non vivantes.",
+        img: "Plan ancien du Jardin des Plantes / portrait de Buffon", s: "Vidéo Ménagerie ; Notes p.1" },
+      { d: "1668", key: true, t: "Louis XIV crée la ménagerie de Versailles",
+        x: "Une centaine d'animaux sont disposés en éventail dans un jardin à la française, pour que le roi puisse tous les voir en même temps. Seuls les invités de marque y ont accès. Le peintre Oudry prend ces animaux (lions, rhinocéros) comme modèles.",
+        img: "Gravure de la ménagerie de Versailles", s: "Vidéo Ménagerie ; Mémoire p.25-26 ; Notes p.1" },
+      { d: "Début du XVIIIe siècle", t: "Des animaux exposés dans les foires",
+        x: "Quelques animaux sont montrés dans les foires, comme l'éléphant de Louis XIII ou le rhinocéros de Versailles à la foire Saint-Germain.",
+        img: "Foire Saint-Germain, rhinocéros", s: "Mémoire p.25" },
+      { d: "1752", key: true, t: "Zoo de Schönbrunn (Vienne, Autriche) : le premier zoo",
+        x: "Créé par François Ier, aidé de son architecte. Un bâtiment central est entouré de 13 enclos : on ne parle plus de cages mais d'enclos. C'est la première conception de zoo moderne, et il est toujours ouvert aujourd'hui.",
+        img: "Plan en étoile du zoo de Schönbrunn", s: "Vidéo Toopet ; Notes p.4" },
+      { d: "1765", t: "L'Encyclopédie critique les ménageries",
+        x: "L'Encyclopédie de Diderot et d'Alembert écrit qu'il faut détruire les ménageries quand le peuple manque de pain : il serait honteux de nourrir des bêtes à grands frais alors que des hommes meurent de faim. Cela annonce la Révolution.",
+        img: "Page de l'Encyclopédie", s: "Mémoire p.26" },
+      { d: "1789", key: true, t: "La Révolution détruit les ménageries royales",
+        x: "Beaucoup d'animaux des ménageries royales sont abattus. La ménagerie de Versailles est détruite ; il n'en reste que quelques animaux.",
+        img: "Ruines de la ménagerie de Versailles", s: "Mémoire p.26 ; Vidéo Ménagerie ; Notes p.1" },
+    ]
+  },
+  {
+    titre: "La naissance de la Ménagerie du Jardin des Plantes",
+    sous: "1792 – 1794 : le premier zoo public en France",
+    ev: [
+      { d: "1792", t: "Bernardin de Saint-Pierre veut des animaux vivants",
+        x: "Dernier intendant du Jardin du Roi, il visite ce qu'il reste de la ménagerie de Versailles et y voit un quagga (zèbre d'Afrique du Sud, aujourd'hui éteint), qui deviendra l'un des premiers habitants de la Ménagerie. Il écrit un mémoire au Comité de salut public pour défendre une ménagerie au jardin : progrès des arts, des sciences, de l'économie rurale, de la philosophie, relations politiques avec les puissances étrangères, intérêt de la capitale, éducation du public. Les deux premiers buts sont donc la recherche et l'éducation. Réponse : les caisses de l'État sont vides, et mettre des animaux derrière des barreaux alors que tant de gens sont emprisonnés serait mal vu. La ménagerie n'est pas créée tout de suite.",
+        img: "Portrait de Bernardin de Saint-Pierre / quagga", s: "Vidéo Ménagerie ; Notes p.1 ; Mémoire p.26" },
+      { d: "10 juin 1793", key: true, t: "Création du Muséum national d'histoire naturelle",
+        x: "Le Jardin du Roi devient officiellement le Muséum.",
+        img: "Façade du Muséum", s: "Notes p.1 ; Vidéo Ménagerie" },
+      { d: "3 novembre 1793", key: true, t: "Fin des animaux sauvages dans les rues de Paris",
+        x: "Un arrêté du conseil général de la Commune de Paris interdit d'exhiber des animaux sauvages dans les rues. Les animaux des spectacles sont confisqués et envoyés au Jardin des Plantes : 2 panthères, 4 ours, 2 chats-tigres, 2 civettes, 4 mandrills, 4 aigles, 4 agoutis, 2 vautours, 4 macaques et 1 singe. Geoffroy Saint-Hilaire, professeur de zoologie et futur premier directeur de la Ménagerie, les accueille dans des serres et de vieux bâtiments. Ces animaux gênaient aussi la population par leur odeur et leurs bruits. Plus de 200 ans plus tard, une loi interdit aussi les animaux sauvages dans les spectacles de cirque.",
+        img: "Gravure d'un montreur d'ours à Paris", s: "Notes p.1 ; Vidéo Ménagerie ; Mémoire p.26" },
+      { d: "16 mai 1794", key: true, t: "Création officielle de la Ménagerie du Jardin des Plantes",
+        x: "Les derniers animaux de Versailles (le quagga, un bubale, un lion accompagné d'un chien) sont amenés à Paris. Des loges sont construites très vite avec des grilles et des matériaux récupérés à Versailles. Les animaux sont regroupés dans un jardin à l'anglaise, dans des cages minuscules. C'est aujourd'hui le 2e plus vieux zoo du monde encore ouvert.",
+        img: "Gravure ancienne de la Ménagerie", s: "Notes p.2 et p.4 ; Mémoire p.26 ; Vidéo Toopet" },
+    ]
+  },
+  {
+    titre: "Le XIXe siècle : le zoo-musée des savants",
+    sous: "Étudier, classer, montrer",
+    ev: [
+      { d: "1798", t: "Deux éléphants et un concert",
+        x: "La ménagerie grandit grâce aux animaux confisqués pendant les guerres (ménagerie royale d'Arnhem en Hollande, ours de Berne…). Deux éléphants venus de Hollande arrivent en 1798. Comme ils s'ennuient seuls dans leur loge, on leur fait donner un concert, et les savants du Muséum décrivent leurs réactions à la musique.",
+        img: "Gravure du concert donné aux éléphants", s: "Vidéo Ménagerie ; Notes p.2" },
+      { d: "1802 → 1888", t: "Les grands bâtiments de la Ménagerie",
+        x: "De 1802 à 1825, on construit une quinzaine de « fabriques » (petits bâtiments en briques, torchis, rondins de bois, toits de chaume) qui évoquent les pays d'origine des animaux ; elles existent toujours. Puis viennent la Rotonde (vue du dessus, elle a la forme de la croix de la Légion d'honneur), la galerie des animaux féroces (1818-1821 : 21 loges de 3 m sur 3 m par couple de félins ; les lions y sont nourris avec du pain pendant des dizaines d'années), la faisanderie (1825-1827), le palais des singes (1837), le palais des reptiles (1874), le bassin des otaries (1882) et la grande volière (1888). En 1900, la Ménagerie compte 500 mammifères et 850 oiseaux.",
+        img: "La Rotonde ou la grande volière", s: "Vidéo Ménagerie ; Notes p.2" },
+      { d: "1826", key: true, t: "Zarafa, première girafe vivante en Europe",
+        x: "Cadeau du pacha d'Égypte au roi Charles X, elle arrive en bateau à Marseille puis marche 41 jours jusqu'à Paris. Elle vit 17 ans à la Rotonde. Des centaines de milliers de visiteurs viennent la voir.",
+        img: "Zarafa la girafe", s: "Vidéo Ménagerie ; Notes p.2" },
+      { d: "XIXe siècle", key: true, t: "Un « cabinet vivant » pour la science",
+        x: "Des savants comme Geoffroy Saint-Hilaire et Cuvier étudient les espèces. Le zoo du XIXe siècle a une présentation « taxonomique » : on montre un maximum d'espèces de chaque groupe (singerie, fauverie…), comme des pièces de musée, dans de petites cages alignées et grillagées. Le bien-être animal n'est pas pris en compte. Geoffroy Saint-Hilaire devient directeur du Muséum en 1859. Vers 1860, les études de comportement montrent un fort stress et une forte mortalité chez les animaux enfermés. Pour survivre financièrement, la ménagerie s'ouvre aux ouvriers et aux artisans.",
+        img: "Portrait de Geoffroy Saint-Hilaire / cages alignées", s: "Mémoire p.27" },
+      { d: "1849 · 1853 · 1880", t: "Le zoo de Londres invente de nouveaux bâtiments",
+        x: "Le zoo de Londres crée le premier vivarium ouvert au public (1849), le premier aquarium public (1853), puis le premier insectarium (1880).",
+        img: "Ancien aquarium du zoo de Londres", s: "Vidéo Toopet ; Notes p.4" },
+    ]
+  },
+  {
+    titre: "Début du XXe siècle : zoos humains et zoos sans barreaux",
+    sous: "Le côté sombre, puis une révolution dans la présentation",
+    ev: [
+      { d: "Fin XIXe – début XXe siècle", key: true, t: "Les zoos humains",
+        x: "Des pays colonisateurs exposent des hommes, des femmes et des enfants venus des colonies, enfermés avec des animaux ou dans des villages reconstitués, par exemple au Jardin d'acclimatation à Paris. On « invente le sauvage ». Le public paie pour voir des gens qu'il ne verrait jamais (pas de télévision à l'époque). Derrière, il y a un racisme : on considère qu'il existerait des populations supérieures et inférieures.",
+        img: "Affiche d'exposition au Jardin d'acclimatation", s: "Vidéo Brut ; Vidéo Toopet ; Mémoire p.27 ; Notes p.4" },
+      { d: "1907", key: true, t: "Carl Hagenbeck crée le premier zoo sans barreaux",
+        x: "Marchand d'animaux allemand, il ouvre le Tierpark près de Hambourg. Il remplace le béton et les grilles par de grands enclos, des bassins, des fossés et de la végétation. Le visiteur voit l'animal dans un décor qui imite la nature. Presque tous les zoos d'Europe vont le copier. Il invente aussi le « dressage en douceur ».",
+        img: "Tierpark Hagenbeck, Hambourg", s: "Vidéo Toopet ; Mémoire p.28 et p.86 ; Notes p.4" },
+      { d: "1907 et 1931", t: "Expositions coloniales et apparition du mot « zoo »",
+        x: "Deux expositions coloniales ont lieu. Les zoos servent alors de propagande pour montrer la « supériorité » de l'Europe sur les colonies. C'est lors de celle de 1931 que l'abréviation « zoo » apparaît en France, sur le modèle anglais.",
+        img: "Affiche de l'Exposition coloniale de 1931", s: "Mémoire p.27" },
+      { d: "1910 – 1918", t: "Crue de la Seine et Première Guerre mondiale",
+        x: "La grande crue de 1910 inonde complètement la Ménagerie (une girafe est couverte de paille pour la réchauffer). Pendant la guerre de 1914-1918, la plupart des animaux sont tués. D'après les notes, il ne reste plus que 329 pensionnaires en 1918.",
+        img: "Carte postale de la girafe sous la paille, crue de 1910", s: "Vidéo Ménagerie ; Notes p.2" },
+      { d: "1922", t: "La Ménagerie devient payante",
+        x: "Jusqu'en 1922, l'entrée de tous les musées est gratuite. Pour aider le budget de l'État, on les autorise ensuite à faire payer l'entrée : la Ménagerie est payante depuis 1922.",
+        img: "Ancien ticket d'entrée", s: "Vidéo Ménagerie ; Notes p.2" },
+      { d: "1926 · 1934 · 1937", t: "La Ménagerie se modernise",
+        x: "Nouveau vivarium en 1926 (payé par des dons : les débuts du mécénat), nouvelle singerie en 1934, nouvelle fauverie en 1937. Ces bâtiments existent encore.",
+        img: "Le vivarium de la Ménagerie", s: "Vidéo Ménagerie ; Notes p.2" },
+      { d: "2 juin 1934", key: true, t: "Inauguration du Parc zoologique de Paris (Vincennes)",
+        x: "Dans les années 1930, on veut enlever l'aspect de prison. Le Muséum construit un nouveau zoo sans barreaux : les animaux sont séparés du public par des fossés remplis d'eau, au milieu de faux rochers. Mais la présentation reste taxonomique (7 ou 8 espèces d'ours côte à côte). Les girafes de la Ménagerie y partent dès l'ouverture.",
+        img: "Le Grand Rocher de Vincennes", s: "Vidéo Ménagerie ; Notes p.3" },
+    ]
+  },
+  {
+    titre: "Après-guerre : l'âge d'or des zoos",
+    sous: "1939 – 1970",
+    ev: [
+      { d: "1939 – 1945", t: "La guerre détruit des zoos",
+        x: "La guerre détruit de grands zoos, qui seront ensuite reconstruits. En France, les associations de protection animale se développent fortement pendant cette guerre.",
+        img: "Zoo en ruines après la guerre", s: "Vidéo Toopet ; Notes p.4 ; Mémoire p.55" },
+      { d: "Années 1950 – 1960", key: true, t: "L'engouement pour les zoos et les premiers safaris",
+        x: "La télévision et les documentaires font connaître les animaux. Les zoos se multiplient en Europe et aux États-Unis. Naissent les safaris (comme Thoiry) : l'animal vit dans un immense enclos de plusieurs dizaines d'hectares et c'est le visiteur qui circule en voiture. On commence à faire passer le bien-être de l'animal avant le spectacle pour le visiteur.",
+        img: "Voiture dans un parc safari", s: "Vidéo Toopet ; Notes p.4" },
+      { d: "1961", t: "La décolonisation réduit les captures",
+        x: "La vague de décolonisation diminue le nombre d'animaux capturés dans la nature.",
+        img: "Carte de l'Afrique des indépendances", s: "Mémoire p.27" },
+      { d: "Années 1970", t: "Les zoos cherchent à effacer les barreaux",
+        x: "Les zoos essaient de faire disparaître tout ce qui rappelle la détention : barreaux et petites cages. Le verre remplace les barreaux (vue non découpée, moins d'odeurs). On crée des « biozones » avec végétation, grottes, fossés, lacs et rochers.",
+        img: "Enclos vitré avec végétation", s: "Mémoire p.86" },
+    ]
+  },
+  {
+    titre: "Protéger les espèces : lois et conservation",
+    sous: "1973 – 2005",
+    ev: [
+      { d: "1973", key: true, t: "Signature de la Convention de Washington (CITES)",
+        x: "Elle protège les espèces menacées et interdit aux zoos de capturer des animaux menacés dans la nature. Les zoos doivent donc faire se reproduire leurs animaux. C'est aussi le début des associations de protection animale qui poussent les zoos à améliorer l'accueil des animaux.",
+        img: "Logo CITES / signature d'un traité", s: "MNHN ; Vidéo Toopet ; Notes p.4" },
+      { d: "1976 – 1978", t: "Les premières lois françaises",
+        x: "1976 : la loi sur la Nature permet aux associations de porter plainte au nom de la population contre ce qui nuit à l'environnement ou aux animaux. 25 novembre 1977 : décret sur la détention d'animaux non domestiques. 21 août 1978 : décret sur les installations que doivent avoir ces établissements.",
+        img: "Code de l'environnement", s: "Mémoire p.55 et p.79" },
+      { d: "Années 1980", key: true, t: "Les zoos deviennent acteurs de la conservation",
+        x: "Face à la disparition de la biodiversité et des milieux naturels, les zoos comprennent leur rôle dans la conservation. En 1980 naissent en Amérique du Nord les premiers programmes d'élevage coordonnés entre zoos. À la Ménagerie, nouveau plan : « plus d'espace et moins d'espèces ». Les grandes espèces partent (dernier éléphant mort en 1976, dernier ours brun parti à Thoiry en 2004), priorité aux espèces rares et menacées, enclos regroupés et végétalisés, bien-être pris en compte (enrichissement). La Ménagerie passe de 512 espèces en 1966 à 150 en 2020.",
+        img: "Enclos végétalisé de la Ménagerie", s: "MNHN ; Vidéo Ménagerie ; Notes p.3" },
+      { d: "1985", key: true, t: "Création de l'EAZA et des programmes européens d'élevage (EEP)",
+        x: "L'Association européenne des zoos et aquariums est fondée. Les premiers programmes d'élevage européens visent des populations captives viables sur 100 ans, avec 90 % de la diversité génétique, pour d'éventuelles réintroductions. Les animaux sont échangés entre zoos (sans être achetés) pour éviter la consanguinité.",
+        img: "Logo EAZA", s: "MNHN ; Vidéo Toopet ; Notes p.3" },
+      { d: "1993", t: "La Ménagerie classée monument historique",
+        x: "Elle ne peut plus être cassée, agrandie ou modifiée. Elle se sépare donc de ses grands animaux pour garder des espèces plus petites.",
+        img: "La Rotonde de la Ménagerie", s: "Mémoire p.87" },
+      { d: "1999 → 2005", key: true, t: "La « Directive zoos » européenne et les règles françaises",
+        x: "Mars 1999 : directive européenne « zoos ». L'arrêté du 25 mars 2004 la transpose en France : règles de sécurité, de bien-être animal, de pédagogie et de conservation. L'arrêté du 10 août 2004 (modifié le 24 mars 2005) définit les zoos comme des établissements de présentation au public d'animaux sauvages. Il faut une autorisation d'ouverture et un certificat de capacité (délivrés par les DDPP, après autorisation du préfet). Les zoos sont contrôlés au moins une fois par an.",
+        img: "Drapeau européen / panneau réglementaire", s: "Mémoire p.79" },
+    ]
+  },
+  {
+    titre: "Le zoo d'aujourd'hui",
+    sous: "XXIe siècle",
+    ev: [
+      { d: "2008 → 2020", t: "Les zoos du Muséum se transforment",
+        x: "Le Parc zoologique de Paris ferme en 2008 et rouvre en 2014, entièrement rénové : grands enclos végétalisés répartis en 5 biozones (Patagonie, Sahel-Soudan, Guyane, Madagascar, Europe) et un discours sur les écosystèmes plutôt que sur le classement des espèces. À la Ménagerie, la Rotonde est vidée de ses animaux et devient un espace pédagogique pour les scolaires. Les fosses aux ours accueillent pandas roux et binturongs (petits carnivores menacés), la fauverie est agrandie et végétalisée, la faisanderie présente petits singes et oiseaux. Enclos du tapir malais (2016), enclos pour les diables de Tasmanie (2020).",
+        img: "Panda roux de la Ménagerie", s: "Vidéo Ménagerie ; Notes p.3" },
+      { d: "2018 – 2019", t: "Des chiffres qui montrent l'importance des zoos",
+        x: "2018 : 410 zoos de 47 pays d'Europe et du Moyen-Orient participent à 404 programmes d'élevage. 2019 : 1,6 million de visiteurs à Beauval, plus de 560 000 au Parc zoologique de Paris ; les membres de l'EAZA reversent 22,6 millions d'euros à des associations de protection de la nature. Entre 1998 et 2018, plus de 3 345 publications scientifiques impliquent des zoos européens.",
+        img: "Graphique / foule au ZooParc de Beauval", s: "MNHN" },
+      { d: "Aujourd'hui", key: true, t: "Le zoo moderne : conserver, éduquer, chercher, divertir",
+        x: "Plus de 1 200 zoos dans le monde, près de 400 en Europe. Beauval dépasse 2 millions de visiteurs par an et présente 35 000 animaux, dont des pandas. Grâce aux zoos, des animaux nés en captivité ont été réintroduits : cheval de Przewalski (Mongolie), tamarin-lion doré (Brésil : d'une trentaine à 3 000 individus dans la nature), oryx algazelle, vautour moine (Lozère), outarde canepetière (France), oryx d'Arabie (éteint dans la nature en 1972, environ 5 000 aujourd'hui). Les zoos utilisent l'enrichissement et l'entraînement médical pour le bien-être des animaux, et présentent parfois moins d'espèces, mieux adaptées à la captivité.",
+        img: "Tamarin-lion doré ou cheval de Przewalski", s: "MNHN ; Vidéo Toopet ; Notes p.4" },
+    ]
+  },
+];
+
+const DEFS = [
+  ["Ménagerie", "Collection d'animaux sauvages vivants. Aux XVIe et XVIIe siècles, les ménageries étaient privées et réservées à l'aristocratie pour montrer sa richesse.", "Mémoire p.25 ; Notes p.5"],
+  ["Zoo (parc zoologique)", "À l'origine, une « ménagerie fixe ». Selon l'arrêté de 2004 : établissement de présentation au public d'animaux sauvages, autorisé à détenir des espèces que les particuliers ne peuvent pas acquérir. Le mot « zoo » apparaît en France en 1931.", "Mémoire p.25, 27 et 79"],
+  ["Cabinet de curiosités", "Collection d'objets rares classés et exposés ; les animaux exotiques y étaient présentés au même titre que les objets.", "Mémoire p.25"],
+  ["Jardin à la française / à l'anglaise", "À la française : très symétrique (Versailles). À l'anglaise : plus de reliefs, plus libre et plus proche de la nature (Ménagerie de 1794).", "Mémoire p.26"],
+  ["Zoo humain", "Exposition d'êtres humains venus des colonies, présentés comme des « sauvages » dans des enclos ou des villages reconstitués. Vitrine du colonialisme et du racisme.", "Vidéo Brut ; Mémoire p.27"],
+  ["Zoo sans barreaux", "Modèle de Carl Hagenbeck (1907) : grands enclos, fossés, bassins et végétation remplacent les grilles et le béton.", "Vidéo Toopet ; Mémoire p.86"],
+  ["Biozone", "Décor qui recrée le milieu de l'animal (végétation, grottes, fossés, lacs, rochers) et dans lequel le visiteur entre.", "Mémoire p.86"],
+  ["Safari parc", "Parc où les animaux vivent dans un immense enclos et où les visiteurs circulent en voiture : c'est l'humain qui est « enfermé ».", "Vidéo Toopet ; Mémoire p.86"],
+  ["Certificat de capacité", "Certificat obligatoire attribué au responsable de l'entretien des animaux, délivré par les DDPP. Il faut aussi une autorisation d'ouverture.", "Mémoire p.79"],
+  ["Enrichissement", "Ajout d'éléments dans les enclos pour stimuler les animaux (recherche de nourriture, odeurs, réaménagements) et éviter la routine. Il peut être environnemental ou comportemental.", "Mémoire p.88 ; Vidéo Toopet ; Notes p.3"],
+  ["Stéréotypie", "Comportement répétitif (faire toujours le même trajet, se balancer) qui montre qu'un animal va mal psychologiquement.", "Vidéo Toopet ; Mémoire p.88"],
+  ["Entraînement médical", "Méthode de renforcement positif : on récompense l'animal quand il fait le geste voulu, pour faciliter les soins et éviter des anesthésies stressantes.", "MNHN"],
+  ["Élevage conservatoire", "Maintenir en captivité des populations viables d'animaux sauvages qui pourront être réintroduites si leur milieu est stabilisé ou restauré.", "MNHN"],
+  ["Réintroduction", "Remettre dans la nature des animaux nés en captivité. C'est rare et difficile : l'animal doit réapprendre la vie sauvage, et son milieu d'origine doit pouvoir l'accueillir.", "MNHN ; Vidéo Toopet ; Mémoire p.87"],
+  ["Studbook", "Livre généalogique qui recense tous les individus d'une espèce donnée en captivité.", "MNHN"],
+  ["Consanguinité", "Reproduction entre animaux apparentés. Les zoos l'évitent en échangeant des animaux (brassage génétique) grâce aux programmes d'élevage.", "Vidéo Toopet ; MNHN"],
+];
+
+const ACRO = [
+  ["EAZA", "Association européenne des zoos et des aquariums (AZA sans le « E »)"],
+  ["EEP", "Programme d'élevage européen"],
+  ["CITES", "Convention sur le commerce international des espèces de faune et de flore sauvages menacées d'extinction (Convention de Washington, 1973)"],
+  ["UICN", "Union internationale pour la conservation de la nature"],
+  ["CBSG", "Conservation Breeding Specialist Group"],
+  ["DDPP", "Direction départementale de la protection des populations (services vétérinaires)"],
+  ["ONCFS", "Office national de la chasse et de la faune sauvage"],
+  ["LPO", "Ligue pour la protection des oiseaux"],
+  ["SNDA", "Société nationale pour la défense des animaux"],
+  ["LC", "Préoccupation mineure (statut de conservation)"],
+  ["VU", "Vulnérable (statut de conservation)"],
+];
+
+const MISSIONS = [
+  ["Conservation", "Protéger les espèces menacées : programmes d'élevage (EEP), réintroductions et financement de la protection dans le milieu naturel."],
+  ["Éducation", "Sensibiliser le public à la protection des espèces et de la nature : voir un animal « pour de vrai » marque et donne envie d'agir."],
+  ["Recherche", "Faire progresser les connaissances : besoins nutritionnels, reproduction, comportements sociaux, capacités cognitives."],
+  ["Loisir", "Rester un lieu de divertissement et de détente, où l'on passe un bon moment en famille."],
+];
+
+const VIGIL = [
+  "<b>Création de l'EAZA :</b> le Genially du MNHN dit 1985 (« plus de 410 membres de 41 pays »). Les notes indiquent 1988 et « 355 zoos de 44 pays » ; dans la vidéo de la Ménagerie, on entend « 355 zoos en Europe qui participent à ces programmes », mais pas la date de création. La frise utilise 1985, écrit en toutes lettres par le MNHN.",
+  "<b>329 pensionnaires en 1918 et ouverture au public en 1640 :</b> ces deux informations viennent uniquement des notes (sans doute lues sur les diapositives de la vidéo de la Ménagerie) ; elles ne sont pas prononcées à l'oral.",
+  "<b>Nombre de zoos en France :</b> le MNHN parle de 94 établissements ; la vidéo Toopet et les notes parlent d'environ 300 parcs zoologiques. Les deux chiffres ne comptent sans doute pas la même chose : mieux vaut éviter de donner un chiffre, ou préciser la source.",
+  "<b>Oryx algazelle :</b> réintroduit au Tchad selon le MNHN, en Tunisie selon la vidéo Toopet. La frise ne précise pas le pays.",
+  "<b>Rhinocéros de Versailles :</b> le mémoire (p.25) parle d'une exposition à la foire Saint-Germain en 1709, mais sa propre note de bas de page cite une « Histoire du Rhinocéros de Versailles (1770-1793) ». La date 1709 a donc été retirée de la frise.",
+  "<b>Date écartée :</b> le mémoire (p.40) parle de « l'apparition du cinématographe en 1865 ». Cette information concerne les cirques et n'apporte rien à l'histoire des zoos ; elle a été laissée de côté.",
+];
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => s;
+
+function render() {
+  const main = $("#frise");
+  main.innerHTML = PERIODES.map((p) => `
+    <section class="period">
+      <div class="period-head">
+        <span class="eyebrow">${p.sous}</span>
+        <h2>${p.titre}</h2>
+      </div>
+      <div class="track">
+        ${p.ev.map((e) => `
+          <article class="ev${e.key ? " key" : ""}">
+            <div class="date">${e.d}${e.key ? '<span class="tag">Date clé</span>' : ""}</div>
+            <h3>${e.t}</h3>
+            <p class="txt">${e.x}</p>
+            ${e.check ? `<p class="check">${e.check}</p>` : ""}
+            <div class="meta">
+              <span><b>Image :</b> ${e.img}</span>
+              <span><b>Source :</b> ${e.s}</span>
+            </div>
+          </article>`).join("")}
+      </div>
+    </section>`).join("");
+
+  $("#defs").innerHTML = DEFS.map(([t, d, s]) => `
+    <div class="def"><dt>${t}</dt><dd>${d}</dd><span class="src">Source : ${s}</span></div>`).join("");
+  $("#acro").innerHTML = ACRO.map(([a, b]) => `<tr><th scope="row">${a}</th><td>${b}</td></tr>`).join("");
+  $("#mission-list").innerHTML = MISSIONS.map(([t, d], i) => `
+    <div class="mission"><span class="n">${i + 1}</span><h3>${t}</h3><p>${d}</p></div>`).join("");
+  $("#vigilance").innerHTML = VIGIL.map((v) => `<li>${v}</li>`).join("");
+}
+
+function asText() {
+  const strip = (h) => h.replace(/<[^>]+>/g, "");
+  let out = "HISTOIRE DES PARCS ZOOLOGIQUES ET DE LEURS ÉVOLUTIONS\n\n";
+  PERIODES.forEach((p) => {
+    out += `=== ${p.titre.toUpperCase()} (${p.sous}) ===\n\n`;
+    p.ev.forEach((e) => {
+      out += `${e.d}${e.key ? " [DATE CLÉ]" : ""} : ${e.t}\n${e.x}\nImage : ${e.img}\nSource : ${e.s}\n\n`;
+    });
+  });
+  out += "=== DÉFINITIONS ===\n\n";
+  DEFS.forEach(([t, d]) => { out += `${t} : ${d}\n`; });
+  out += "\nSigles :\n";
+  ACRO.forEach(([a, b]) => { out += `${a} : ${b}\n`; });
+  out += "\n=== LES 4 MISSIONS D'UN ZOO EN 2026 ===\n\n";
+  MISSIONS.forEach(([t, d], i) => { out += `${i + 1}. ${t} : ${d}\n`; });
+  out += "\nCondition : ces missions ne sont légitimes qu'à condition de garantir le bien-être des animaux.\n";
+  return strip(out);
+}
+
+$("#copy-all").addEventListener("click", () => {
+  const text = asText();
+  const status = $("#copy-status");
+  navigator.clipboard.writeText(text).then(
+    () => { status.textContent = "Copié. Tu peux le coller dans ton application."; },
+    () => {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.width = "100%"; ta.style.minHeight = "200px";
+      status.textContent = "La copie automatique est bloquée : sélectionne le texte ci-dessous et copie-le.";
+      status.after(ta); ta.select();
+    });
+});
+
+render();
+</script>
+
+</html>
